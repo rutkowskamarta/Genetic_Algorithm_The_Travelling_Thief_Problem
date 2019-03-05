@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GeneticAlgorithmTTP
 {
-    class CityElement
+    public class CityElement: ICloneable<CityElement>
     {
         public int index {get; set;}
         public double xCoordinate { get; set; }
@@ -16,6 +16,14 @@ namespace GeneticAlgorithmTTP
             this.index = index;
             this.xCoordinate = xCoordinate;
             this.yCoordinate = yCoordinate;
+        }
+
+        public CityElement(int index, double xCoordinate, double yCoordinate, ItemElement itemElement)
+        {
+            this.index = index;
+            this.xCoordinate = xCoordinate;
+            this.yCoordinate = yCoordinate;
+            itemInTheCity = itemElement;
         }
 
         public double CalculateDistance(CityElement other)
@@ -30,6 +38,16 @@ namespace GeneticAlgorithmTTP
             else
                 return $"{index} {xCoordinate} {yCoordinate} null";
 
+        }
+
+        public CityElement Clone()
+        {
+            if(itemInTheCity == null)
+            {
+                return new CityElement(index, xCoordinate, yCoordinate, null);
+
+            }
+            return new CityElement(index, xCoordinate, yCoordinate, itemInTheCity.Clone());
         }
     }
 }

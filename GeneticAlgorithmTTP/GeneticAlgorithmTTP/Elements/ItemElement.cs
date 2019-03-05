@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GeneticAlgorithmTTP
 {
-    class ItemElement
+    public class ItemElement : ICloneable<ItemElement>
     {
         public int index { get; set; }
         public int profit { get; set; }
@@ -22,6 +22,11 @@ namespace GeneticAlgorithmTTP
         public override string ToString()
         {
             return $"{index} {profit} {weight} {assignedNodeNumber}";
+        }
+
+        public ItemElement Clone()
+        {
+            return new ItemElement(index, profit, weight, assignedNodeNumber);
         }
     }
 }

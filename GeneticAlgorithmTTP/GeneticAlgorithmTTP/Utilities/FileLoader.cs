@@ -5,6 +5,7 @@ using System.IO;
 using static System.Console;
 using System.Globalization;
 
+
 namespace GeneticAlgorithmTTP
 {
     class FileLoader
@@ -35,10 +36,15 @@ namespace GeneticAlgorithmTTP
 
                 int counter = 10; //10 linijka to pierwsze dane o miastach
                 string[] line = ExtractData(allLines[counter]);
+                dataLoaded.firstCity = new CityElement(Int32.Parse(line[0]), Double.Parse(line[1].Replace('.', ',')), Double.Parse(line[2].Replace('.', ',')));
+
+                counter++;
+                line = ExtractData(allLines[counter]); 
                 dataLoaded.cities = new List<CityElement>();
 
                 while (line[0] != "ITEMS")
                 {
+
                     dataLoaded.cities.Add(new CityElement(Int32.Parse(line[0]), Double.Parse(line[1].Replace('.', ',')), Double.Parse(line[2].Replace('.', ','))));
                     counter++;
                     line = ExtractData(allLines[counter]);
@@ -50,7 +56,7 @@ namespace GeneticAlgorithmTTP
                 while (counter<allLines.Length-1)
                 {
                     ItemElement item = new ItemElement(Int32.Parse(line[0]), Int32.Parse(line[1]), Int32.Parse(line[2]), Int32.Parse(line[3]));
-                    dataLoaded.cities[item.assignedNodeNumber - 1].itemInTheCity = item;
+                    dataLoaded.cities[item.assignedNodeNumber-2].itemInTheCity = item;
                     counter++;
                     line = ExtractData(allLines[counter]);
                 }

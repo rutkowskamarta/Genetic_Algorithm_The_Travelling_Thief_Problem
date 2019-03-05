@@ -6,55 +6,55 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="student\easy_0.ttp">
+    <None Update="Data\easy_0.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\easy_1.ttp">
+    <None Update="Data\easy_1.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\easy_2.ttp">
+    <None Update="Data\easy_2.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\easy_3.ttp">
+    <None Update="Data\easy_3.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\easy_4.ttp">
+    <None Update="Data\easy_4.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\hard_0.ttp">
+    <None Update="Data\hard_0.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\hard_1.ttp">
+    <None Update="Data\hard_1.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\hard_2.ttp">
+    <None Update="Data\hard_2.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\hard_3.ttp">
+    <None Update="Data\hard_3.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\hard_4.ttp">
+    <None Update="Data\hard_4.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\medium_0.ttp">
+    <None Update="Data\medium_0.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\medium_1.ttp">
+    <None Update="Data\medium_1.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\medium_2.ttp">
+    <None Update="Data\medium_2.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\medium_3.ttp">
+    <None Update="Data\medium_3.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\medium_4.ttp">
+    <None Update="Data\medium_4.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\trivial_0.ttp">
+    <None Update="Data\trivial_0.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="student\trivial_1.ttp">
+    <None Update="Data\trivial_1.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

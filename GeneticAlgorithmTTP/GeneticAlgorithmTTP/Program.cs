@@ -6,7 +6,7 @@ namespace GeneticAlgorithmTTP
 {
     class Program
     {
-        private const string FILE_NAME = "student\\trivial_0.ttp";
+        private const string FILE_NAME = "Data\\trivial_0.ttp";
 
         private const string RULETKA_SELECTION_METHOD = "ruletka";
         private const string TURNIEJ_SELECTION_METHOD = "turniej";
@@ -31,6 +31,7 @@ namespace GeneticAlgorithmTTP
             dataLoaded = fileLoader.LoadFile();
             dataLoaded.FillTheDistancesMatrix();
 
+            GeneticAlgorithm g = new GeneticAlgorithm(dataLoaded);
 
             ReadLine();
         }
