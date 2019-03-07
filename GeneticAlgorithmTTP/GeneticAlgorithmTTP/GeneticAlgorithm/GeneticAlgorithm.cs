@@ -9,17 +9,22 @@ namespace GeneticAlgorithmTTP
 {
     class GeneticAlgorithm
     {
-        private Thief thief;
+        public Thief thief;
 
-        private int populationSize;
-        private int numberOfGenerations; //stop condition - może to być warunek stopu
-        private double probabilityOfCrossover;
-        private double probabilityOfMutation;
-        private int tour; //rozmiar turnieju 
+        private int currentGeneration = 0;
+
+        private List<TSPSpecimen> population;
+        private List<TSPSpecimen> newPopulation;
+
+        private TSPSpecimen bestSolution;
+
+        Random random;
 
         private delegate TSPSpecimen mutationDelegate(TSPSpecimen specimen);
-
         private mutationDelegate mutationFunction;
+
+        private delegate List<TSPSpecimen> selectionDelegate();
+        private selectionDelegate selectionFunction;
 
         private SELECTION_METHOD selectionMethod = SELECTION_METHOD.RULETKA;
         private MUTATION_METHOD mutationMethod = MUTATION_METHOD.SWAP;
@@ -45,23 +50,81 @@ namespace GeneticAlgorithmTTP
             }
         }
 
-        private TSPSpecimen testRandomSpecimen;
+        public SELECTION_METHOD SelectionMethod
+        {
+            get
+            {
+                return selectionMethod;
+            }
+            set
+            {
+                selectionMethod = value;
+                switch (value)
+                {
+                    case SELECTION_METHOD.RULETKA:
+                        selectionFunction = RouletteSelectionMethod;
+                        break;
+                }
+            }
+        }
 
-        Random random;
 
         public GeneticAlgorithm(DataLoaded dataLoaded)
         {
             thief = new Thief();
             random = new Random();
-            testRandomSpecimen = new TSPSpecimen(dataLoaded);
 
             MutationMethod = mutationMethod;
+            SelectionMethod = selectionMethod;
+
+            InitializePopulation(dataLoaded);
+        }
+
+        private void InitializePopulation(DataLoaded dataLoaded)
+        {
+            population = new List<TSPSpecimen>(POPULATION_SIZE);
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                population.Add(new TSPSpecimen(dataLoaded));
+            }
+        }
+
+        public TSPSpecimen GeneticCycle()
+        {
+            bestSolution = FindBest(population);
+            while (currentGeneration < NUMBER_OF_GENERATIONS)
+            {
+                currentGeneration++;
+
+                newPopulation = Selection();
+                newPopulation.ForEach(p => Cross(p));
+                newPopulation.ForEach(p => Mutate(p));
+
+                TSPSpecimen bestSolutionInNewPopolation = FindBest(newPopulation);
+                if(bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity)< bestSolution.TotalTimeOfTravel(thief.currentVelocity))
+                {
+                    bestSolution = bestSolutionInNewPopolation;
+                }
+
+                WriteLine("BEST: "+bestSolution.TotalTimeOfTravel(thief.currentVelocity)+" new: "+bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity));
+            }
+            return bestSolution;
+        }
+
+        private TSPSpecimen FindBest(List<TSPSpecimen> examinedPopulation)
+        {
+            return examinedPopulation.Aggregate((i1, i2) => (i1.TotalTimeOfTravel(thief.currentVelocity)).CompareTo(i2.TotalTimeOfTravel(thief.currentVelocity)) > 0 ? i1 : i2);
+        }
+
+        private List<TSPSpecimen> Selection()
+        {
+            return selectionFunction();
         }
 
         private TSPSpecimen Mutate(TSPSpecimen specimen)
         {
             double chance = random.NextDouble();
-            if (chance <= probabilityOfMutation)
+            if (chance <= PROBABILITY_OF_MUTATION)
             {
                 return mutationFunction(specimen);
             }
@@ -70,6 +133,58 @@ namespace GeneticAlgorithmTTP
                 return specimen;
             }
         }
+
+        //jedno dziecko powstaje w moim alg
+        private TSPSpecimen Cross(TSPSpecimen self)
+        {
+            double chance = random.NextDouble();
+            if (chance <= PROBABILITY_OF_CROSSOVER)
+            {
+                int index = random.Next(POPULATION_SIZE);
+                TSPSpecimen secondParent = newPopulation[index];
+                return OXCross(self, secondParent);
+            }
+            else
+            {
+                return self;
+            }
+        }
+
+        //wyliczenie dla wszystkich osobników miary
+        private void Evaluate()
+        {
+
+        }
+
+        #region SELECTION_METHODS
+        private List<TSPSpecimen> RouletteSelectionMethod()
+        {
+            double totalFitnessSum = population.Sum(specimen => specimen.TotalTimeOfTravel(thief.currentVelocity));
+            List<TSPSpecimen> newPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                newPopulation.Add(RouletteSelectionMethodForOneSpecimen(totalFitnessSum));
+            }
+            return newPopulation;
+        }
+
+        private TSPSpecimen RouletteSelectionMethodForOneSpecimen(double totalFitnessSum)
+        {
+            double randomNumber = random.NextDouble() * totalFitnessSum;
+            double partialSum = 0;
+            for (int i = 0; i < population.Count; i++)
+            {
+                partialSum += population[i].TotalTimeOfTravel(thief.currentVelocity);
+                if (partialSum >= randomNumber)
+                {
+                    return population[i];
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
 
         #region MUTATION_FUNCTIONS
 
@@ -123,20 +238,7 @@ namespace GeneticAlgorithmTTP
         #endregion
 
         #region CROSS_FUNCTIONS
-        //jedno dziecko powstaje w moim alg
-        private TSPSpecimen Cross(TSPSpecimen parent1, TSPSpecimen parent2)
-        {
-            double chance = random.NextDouble();
-            if (chance <= probabilityOfCrossover)
-            {
-                return OXCross(parent1, parent2);
-            }
-            else
-            {
-                return parent1;
-            }
-        }
-
+       
         private TSPSpecimen OXCross(TSPSpecimen parent1, TSPSpecimen parent2)
         {
             int crossPoint1 = random.Next(0, parent1.citiesVisitedInOrder.Count);

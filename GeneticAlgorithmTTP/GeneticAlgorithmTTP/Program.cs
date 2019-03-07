@@ -18,7 +18,8 @@ namespace GeneticAlgorithmTTP
             dataLoaded.FillTheDistancesMatrix();
 
             GeneticAlgorithm g = new GeneticAlgorithm(dataLoaded);
-
+            TSPSpecimen best = g.GeneticCycle();
+            WriteLine("BEST: " + best.TotalTimeOfTravel(g.thief.currentVelocity));
             ReadLine();
         }
 

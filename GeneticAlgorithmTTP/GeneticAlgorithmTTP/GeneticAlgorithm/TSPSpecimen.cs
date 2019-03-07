@@ -8,13 +8,13 @@ namespace GeneticAlgorithmTTP
 {
     class TSPSpecimen
     {
-        public List<CityElement> citiesVisitedInOrder { get; set; }
+        public CityElement firstCity { get; set; }
+        public List<CityElement> citiesVisitedInOrder { get; set; } //bez pierwszego
         private DataLoaded dataLoaded; 
 
         public TSPSpecimen(DataLoaded dataLoaded)
         {
             this.dataLoaded = dataLoaded;
-            citiesVisitedInOrder = new List<CityElement>();
             FillTheVisitedCitiesList();
         }
 
@@ -25,35 +25,45 @@ namespace GeneticAlgorithmTTP
 
         private void FillTheVisitedCitiesList()
         {
-            citiesVisitedInOrder.Add(dataLoaded.firstCity.Clone());
+            firstCity = dataLoaded.firstCity.Clone();
 
-            List<CityElement> restOfTheCities = new List<CityElement>();
+            citiesVisitedInOrder = new List<CityElement>();
 
             for (int i = 0; i < dataLoaded.cities.Count; i++)
             {
-                restOfTheCities.Add(dataLoaded.cities[i].Clone());
+                citiesVisitedInOrder.Add(dataLoaded.cities[i].Clone());
             }
 
-            restOfTheCities = restOfTheCities.OrderBy(a => Guid.NewGuid()).ToList();
-            citiesVisitedInOrder.AddRange(restOfTheCities);
+            citiesVisitedInOrder = citiesVisitedInOrder.OrderBy(a => Guid.NewGuid()).ToList();
         }
 
         public double TotalTimeOfTravel(float velocity)
         {
-            double totalTime = 0;
+            double totalTime = CalculateTime(velocity, firstCity.index, citiesVisitedInOrder[0].index);
             for (int i = 0; i < citiesVisitedInOrder.Count-1; i++)
             {
-                totalTime += CalculateTime(velocity, i, i + 1);
+                totalTime += CalculateTime(velocity, citiesVisitedInOrder[i].index, citiesVisitedInOrder[i + 1].index);
             }
-            totalTime += CalculateTime(velocity, citiesVisitedInOrder.Count - 1, 1);
+            totalTime += CalculateTime(velocity, citiesVisitedInOrder[citiesVisitedInOrder.Count - 1].index, firstCity.index);
             return totalTime;
         }
 
 
-        private double CalculateTime(float velocity, int sourceCityInList, int destinationCityInList)
+        private double CalculateTime(float velocity, int sourceCityIdentifier, int destinationCityIdentifier)
         {
             //sourceCityInList oraz destinationCityInList to nie ich identyfikatory a indeks w liście citiesVisitedInOrder
-            return (dataLoaded.distancesMatrix[citiesVisitedInOrder[sourceCityInList].index-1, citiesVisitedInOrder[destinationCityInList].index - 1])/velocity;
+            return (dataLoaded.distancesMatrix[sourceCityIdentifier - 1, destinationCityIdentifier - 1])/velocity;
+        }
+
+        public string CitiesToString()
+        {
+            StringBuilder s = new StringBuilder();
+            s.Append(firstCity.index);
+            foreach (var item in citiesVisitedInOrder)
+            {
+                s.Append(item.index);
+            }
+            return s.ToString();
         }
 
     }
