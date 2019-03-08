@@ -4,8 +4,10 @@ using System.Text;
 
 namespace GeneticAlgorithmTTP
 {
-    public class DataLoaded
+    public sealed class DataLoaded
     {
+        private static DataLoaded instance = null;
+
         public string problemName { get; set; }
         public int totalNumberOfCities { get; set; }
         public int totalNumberOfItems { get; set; }
@@ -13,10 +15,24 @@ namespace GeneticAlgorithmTTP
         public double minimumSpeed { get; set; }
         public double maximumSpeed { get; set; }
 
-        public CityElement firstCity { get; set; }
-        public List<CityElement> cities { get; set; } //bez pierwszego miasta
+        public List<CityElement> cities { get; set; } 
 
         public double[,] distancesMatrix;
+
+        private DataLoaded()
+        {
+            //FillTheDistancesMatrix();
+        }
+
+        public static DataLoaded GetInstance()
+        {
+            if (instance == null)
+            {
+                instance = new DataLoaded();
+            }
+            return instance;
+        }
+
 
         public override string ToString()
         {
@@ -26,18 +42,13 @@ namespace GeneticAlgorithmTTP
         public void FillTheDistancesMatrix()
         {
             distancesMatrix = new double[totalNumberOfCities, totalNumberOfCities];
-            List<CityElement> calculationCities = new List<CityElement>();
 
-            calculationCities.Add(firstCity);
-            calculationCities.AddRange(cities);
-
-           
             for (int i = 0; i < totalNumberOfCities; i++)
             {
                 for (int j = i; j < totalNumberOfCities; j++)
                 {
-                    distancesMatrix[i, j] = calculationCities[i].CalculateDistance(calculationCities[j]);
-                    distancesMatrix[j, i] = calculationCities[i].CalculateDistance(calculationCities[j]);
+                    distancesMatrix[i, j] = cities[i].CalculateDistance(cities[j]);
+                    distancesMatrix[j, i] = cities[i].CalculateDistance(cities[j]);
                 }
             }
         }

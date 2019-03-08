@@ -8,14 +8,12 @@ namespace GeneticAlgorithmTTP
 {
     public class TSPSpecimen
     {
-        public CityElement firstCity { get; set; }
-        public List<CityElement> citiesVisitedInOrder { get; set; } //bez pierwszego
+        public List<CityElement> citiesVisitedInOrder { get; set; }
         public double travelTime;
         private DataLoaded dataLoaded; 
         
         public TSPSpecimen(DataLoaded dataLoaded)
         {
-            this.dataLoaded = dataLoaded;
             FillTheVisitedCitiesList();
         }
 
@@ -26,8 +24,6 @@ namespace GeneticAlgorithmTTP
 
         private void FillTheVisitedCitiesList()
         {
-            firstCity = dataLoaded.firstCity.Clone();
-
             citiesVisitedInOrder = new List<CityElement>();
 
             for (int i = 0; i < dataLoaded.cities.Count; i++)
@@ -40,26 +36,24 @@ namespace GeneticAlgorithmTTP
 
         public double TotalTimeOfTravel(float velocity)
         {
-            double totalTime = CalculateTime(velocity, firstCity.index, citiesVisitedInOrder[0].index);
+            double totalTime = 0;
             for (int i = 0; i < citiesVisitedInOrder.Count-1; i++)
             {
                 totalTime += CalculateTime(velocity, citiesVisitedInOrder[i].index, citiesVisitedInOrder[i + 1].index);
             }
-            totalTime += CalculateTime(velocity, citiesVisitedInOrder[citiesVisitedInOrder.Count - 1].index, firstCity.index);
+            totalTime += CalculateTime(velocity, citiesVisitedInOrder[citiesVisitedInOrder.Count - 1].index, citiesVisitedInOrder[0].index);
             return totalTime;
         }
 
 
         private double CalculateTime(float velocity, int sourceCityIdentifier, int destinationCityIdentifier)
         {
-            //sourceCityInList oraz destinationCityInList to nie ich identyfikatory a indeks w liście citiesVisitedInOrder
             return (dataLoaded.distancesMatrix[sourceCityIdentifier - 1, destinationCityIdentifier - 1])/velocity;
         }
 
         public TSPSpecimen Clone()
         {
             TSPSpecimen newSpecimen = new TSPSpecimen();
-            newSpecimen.firstCity = firstCity;
             newSpecimen.citiesVisitedInOrder = new List<CityElement>();
             newSpecimen.dataLoaded = dataLoaded;
             for (int i = 0; i < citiesVisitedInOrder.Count; i++)
@@ -73,7 +67,6 @@ namespace GeneticAlgorithmTTP
         public string CitiesToString()
         {
             StringBuilder s = new StringBuilder();
-            s.Append(firstCity.index+",");
             foreach (var item in citiesVisitedInOrder)
             {
                 s.Append(item.index+ ",");

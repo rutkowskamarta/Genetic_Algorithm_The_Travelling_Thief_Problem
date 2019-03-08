@@ -5,7 +5,6 @@ using System.IO;
 using static System.Console;
 using System.Globalization;
 
-
 namespace GeneticAlgorithmTTP
 {
     class FileLoader
@@ -15,48 +14,47 @@ namespace GeneticAlgorithmTTP
         public FileLoader(string fileName)
         {
             this.fileName = fileName;
+            LoadFile();
         }
 
-        public DataLoaded LoadFile()
+        public void LoadFile()
         {
-            DataLoaded dataLoaded = new DataLoaded();
+            DataLoaded dataLoaded = DataLoaded.GetInstance();
             try
             {
-                StreamReader streamReader = new StreamReader(fileName);
-                
-                string wholeText = streamReader.ReadToEnd();
-                string[] allLines = wholeText.Split("\n");
+                string[] allLines = File.ReadAllLines(fileName);
                 dataLoaded.problemName = allLines[0].Split(' ')[2].Trim();
-                dataLoaded.totalNumberOfCities = Int32.Parse(ExtractData(allLines[2])[1]);
+                dataLoaded.totalNumberOfCities = int.Parse(ExtractData(allLines[2])[1]);
 
-                dataLoaded.totalNumberOfItems = Int32.Parse(ExtractData(allLines[3])[3]);
-                dataLoaded.capacityOfKnapsack = Int32.Parse(ExtractData(allLines[4])[3]);
-                dataLoaded.minimumSpeed = Double.Parse(ExtractData(allLines[5])[2].Replace('.',','));
-                dataLoaded.maximumSpeed = Double.Parse(ExtractData(allLines[6])[2].Replace('.',','));
+                dataLoaded.totalNumberOfItems = int.Parse(ExtractData(allLines[3])[3]);
+                dataLoaded.capacityOfKnapsack = int.Parse(ExtractData(allLines[4])[3]);
+                dataLoaded.minimumSpeed = double.Parse(ExtractData(allLines[5])[2], CultureInfo.InvariantCulture);
+                dataLoaded.maximumSpeed = double.Parse(ExtractData(allLines[6])[2], CultureInfo.InvariantCulture);
 
                 int counter = 10; //10 linijka to pierwsze dane o miastach
                 string[] line = ExtractData(allLines[counter]);
-                dataLoaded.firstCity = new CityElement(Int32.Parse(line[0]), Double.Parse(line[1].Replace('.', ',')), Double.Parse(line[2].Replace('.', ',')));
 
-                counter++;
+                List<CityElement> allParsedCities = new List<CityElement>();
+
                 line = ExtractData(allLines[counter]); 
                 dataLoaded.cities = new List<CityElement>();
 
                 while (line[0] != "ITEMS")
                 {
-
-                    dataLoaded.cities.Add(new CityElement(Int32.Parse(line[0]), Double.Parse(line[1].Replace('.', ',')), Double.Parse(line[2].Replace('.', ','))));
+                    dataLoaded.cities.Add(new CityElement(int.Parse(line[0]), double.Parse(line[1], CultureInfo.InvariantCulture), double.Parse(line[2], CultureInfo.InvariantCulture)));
                     counter++;
                     line = ExtractData(allLines[counter]);
                 }
             
+                
+
                 counter++;
                 line = ExtractData(allLines[counter]);
 
                 while (counter<allLines.Length-1)
                 {
-                    ItemElement item = new ItemElement(Int32.Parse(line[0]), Int32.Parse(line[1]), Int32.Parse(line[2]), Int32.Parse(line[3]));
-                    dataLoaded.cities[item.assignedNodeNumber-2].itemInTheCity = item;
+                    ItemElement item = new ItemElement(int.Parse(line[0]), int.Parse(line[1]), int.Parse(line[2]), int.Parse(line[3]));
+                    dataLoaded.cities[item.assignedNodeNumber-2].itemsInTheCity.Add(item);
                     counter++;
                     line = ExtractData(allLines[counter]);
                 }
@@ -69,14 +67,16 @@ namespace GeneticAlgorithmTTP
             {
                 WriteLine("Problem z parsowaniem "+e);
             }
-            return dataLoaded;
+
+            foreach (var item in DataLoaded.GetInstance().cities)
+            {
+                WriteLine(item.ToString());
+            }
         }
 
         private string[] ExtractData(string line)
         {
             return System.Text.RegularExpressions.Regex.Split(line, @"\s+");
         }
-
-        
     }
 }

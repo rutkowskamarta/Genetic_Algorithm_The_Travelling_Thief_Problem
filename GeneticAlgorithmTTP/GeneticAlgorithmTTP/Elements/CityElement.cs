@@ -9,23 +9,16 @@ namespace GeneticAlgorithmTTP
         public int index {get; set;}
         public double xCoordinate { get; set; }
         public double yCoordinate { get; set; }
-        public ItemElement itemInTheCity { get; set; }
+        public List<ItemElement> itemsInTheCity { get; set; }
 
         public CityElement(int index, double xCoordinate, double yCoordinate)
         {
             this.index = index;
             this.xCoordinate = xCoordinate;
             this.yCoordinate = yCoordinate;
+            itemsInTheCity = new List<ItemElement>();
         }
-
-        public CityElement(int index, double xCoordinate, double yCoordinate, ItemElement itemElement)
-        {
-            this.index = index;
-            this.xCoordinate = xCoordinate;
-            this.yCoordinate = yCoordinate;
-            itemInTheCity = itemElement;
-        }
-
+       
         public double CalculateDistance(CityElement other)
         {
             return Math.Sqrt(Math.Pow(xCoordinate - other.xCoordinate, 2) + Math.Pow(yCoordinate - other.yCoordinate, 2));
@@ -33,21 +26,21 @@ namespace GeneticAlgorithmTTP
 
         public override string ToString()
         {
-            if (itemInTheCity != null)
-                return $"{index} {xCoordinate} {yCoordinate} {itemInTheCity.ToString()}";
-            else
-                return $"{index} {xCoordinate} {yCoordinate} null";
-
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (var item in itemsInTheCity)
+            {
+                stringBuilder.Append(item.index);
+            }
+            return $"{index} {xCoordinate} {yCoordinate} items: {stringBuilder.ToString()}";
         }
 
         public CityElement Clone()
         {
-            if(itemInTheCity == null)
+            if(itemsInTheCity.Count == 0)
             {
-                return new CityElement(index, xCoordinate, yCoordinate, null);
-
+                return new CityElement(index, xCoordinate, yCoordinate);
             }
-            return new CityElement(index, xCoordinate, yCoordinate, itemInTheCity.Clone());
+            return new CityElement(index, xCoordinate, yCoordinate);
         }
     }
 }

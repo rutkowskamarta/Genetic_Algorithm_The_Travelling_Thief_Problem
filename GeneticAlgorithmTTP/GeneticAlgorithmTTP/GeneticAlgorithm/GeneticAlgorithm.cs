@@ -69,7 +69,7 @@ namespace GeneticAlgorithmTTP
         }
 
 
-        public GeneticAlgorithm(DataLoaded dataLoaded)
+        public GeneticAlgorithm()
         {
             thief = new Thief();
             random = new Random();
@@ -77,15 +77,19 @@ namespace GeneticAlgorithmTTP
             MutationMethod = mutationMethod;
             SelectionMethod = selectionMethod;
 
-            InitializePopulation(dataLoaded);
+            InitializePopulation();
         }
 
-        private void InitializePopulation(DataLoaded dataLoaded)
+        private void InitializePopulation()
         {
             population = new List<TSPSpecimen>(POPULATION_SIZE);
             for (int i = 0; i < POPULATION_SIZE; i++)
             {
-                population.Add(new TSPSpecimen(dataLoaded));
+                population.Add(new TSPSpecimen(DataLoaded.GetInstance()));
+            }
+            foreach (var item in population)
+            {
+                WriteLine(item.CitiesToString());
             }
         }
 
@@ -111,8 +115,6 @@ namespace GeneticAlgorithmTTP
                     bestSolution = bestSolutionInNewPopolation.Clone();
                 }
 
-                //    WriteLine("BEST: "+bestSolution.TotalTimeOfTravel(thief.currentVelocity)+" "+bestSolution.CitiesToString()
-                //        +" new: "+bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity)+" "+bestSolutionInNewPopolation.CitiesToString());
             }
 
             return bestSolution;

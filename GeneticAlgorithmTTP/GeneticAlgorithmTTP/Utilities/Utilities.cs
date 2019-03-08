@@ -9,6 +9,8 @@ namespace GeneticAlgorithmTTP
     public static class Utilities
     {
         public const string FILE_NAME = "Data\\trivial_0.ttp";
+        public const string CSV_SAVE_LOCATION = @"C:\Users\marar\Desktop\GAresults\";
+        public const string CSV_FILE_EXTENSION = ".csv";
 
         public const int POPULATION_SIZE = 100;
         public const int NUMBER_OF_GENERATIONS = 10000;
@@ -22,13 +24,10 @@ namespace GeneticAlgorithmTTP
 
         public static void SaveSolutionToFile(TSPSpecimen result, string annotation)
         {
-            List<CityElement> resultList = new List<CityElement>();
-            resultList.Add(result.firstCity);
-            resultList.AddRange(result.citiesVisitedInOrder);
-            using (var writer = new StreamWriter(@"C:\Users\marar\Desktop\GAresults\" + annotation+DateTime.Now.ToFileTime() + ".csv", true))
+            using (var writer = new StreamWriter($"{CSV_SAVE_LOCATION+DateTime.Now.ToFileTime()}{annotation}{CSV_FILE_EXTENSION}",true))
             using (var csv = new CsvWriter(writer))
             {
-                csv.WriteRecords(resultList);
+                csv.WriteRecords(result.citiesVisitedInOrder);
             }
         }
         
