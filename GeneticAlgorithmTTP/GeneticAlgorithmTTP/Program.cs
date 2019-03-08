@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using static System.Console;
 using System.IO;
+using CsvHelper;
 
 namespace GeneticAlgorithmTTP
 {
@@ -19,7 +21,10 @@ namespace GeneticAlgorithmTTP
 
             GeneticAlgorithm g = new GeneticAlgorithm(dataLoaded);
             TSPSpecimen best = g.GeneticCycle();
-            WriteLine("BEST: " + best.TotalTimeOfTravel(g.thief.currentVelocity));
+            WriteLine("BEST: " + best.TotalTimeOfTravel(g.thief.currentVelocity)+ " "+best.CitiesToString());
+
+            Utilities.SaveSolutionToFile(best, "rozwiazanie");
+
             ReadLine();
         }
 

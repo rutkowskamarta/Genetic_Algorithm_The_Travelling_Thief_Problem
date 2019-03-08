@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="12.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Data\easy_0.ttp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

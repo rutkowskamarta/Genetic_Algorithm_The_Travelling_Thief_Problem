@@ -91,7 +91,11 @@ namespace GeneticAlgorithmTTP
 
         public TSPSpecimen GeneticCycle()
         {
-            bestSolution = FindBest(population);
+            bestSolution = FindBest(population).Clone();
+            Utilities.SaveSolutionToFile(bestSolution, "najzpierwszpokolenia");
+
+            WriteLine("BEST: " + bestSolution.TotalTimeOfTravel(thief.currentVelocity) + " " + bestSolution.CitiesToString());
+
             while (currentGeneration < NUMBER_OF_GENERATIONS)
             {
                 currentGeneration++;
@@ -101,19 +105,22 @@ namespace GeneticAlgorithmTTP
                 newPopulation.ForEach(p => Mutate(p));
 
                 TSPSpecimen bestSolutionInNewPopolation = FindBest(newPopulation);
-                if(bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity)< bestSolution.TotalTimeOfTravel(thief.currentVelocity))
+
+                if (bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity) < bestSolution.TotalTimeOfTravel(thief.currentVelocity))
                 {
-                    bestSolution = bestSolutionInNewPopolation;
+                    bestSolution = bestSolutionInNewPopolation.Clone();
                 }
 
-                WriteLine("BEST: "+bestSolution.TotalTimeOfTravel(thief.currentVelocity)+" new: "+bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity));
+                //    WriteLine("BEST: "+bestSolution.TotalTimeOfTravel(thief.currentVelocity)+" "+bestSolution.CitiesToString()
+                //        +" new: "+bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity)+" "+bestSolutionInNewPopolation.CitiesToString());
             }
+
             return bestSolution;
         }
 
         private TSPSpecimen FindBest(List<TSPSpecimen> examinedPopulation)
         {
-            return examinedPopulation.Aggregate((i1, i2) => (i1.TotalTimeOfTravel(thief.currentVelocity)).CompareTo(i2.TotalTimeOfTravel(thief.currentVelocity)) > 0 ? i1 : i2);
+            return examinedPopulation.OrderBy(i1 => i1.TotalTimeOfTravel(thief.currentVelocity)).First();
         }
 
         private List<TSPSpecimen> Selection()

@@ -6,12 +6,13 @@ using static System.Console;
 
 namespace GeneticAlgorithmTTP
 {
-    class TSPSpecimen
+    public class TSPSpecimen
     {
         public CityElement firstCity { get; set; }
         public List<CityElement> citiesVisitedInOrder { get; set; } //bez pierwszego
+        public double travelTime;
         private DataLoaded dataLoaded; 
-
+        
         public TSPSpecimen(DataLoaded dataLoaded)
         {
             this.dataLoaded = dataLoaded;
@@ -55,13 +56,27 @@ namespace GeneticAlgorithmTTP
             return (dataLoaded.distancesMatrix[sourceCityIdentifier - 1, destinationCityIdentifier - 1])/velocity;
         }
 
+        public TSPSpecimen Clone()
+        {
+            TSPSpecimen newSpecimen = new TSPSpecimen();
+            newSpecimen.firstCity = firstCity;
+            newSpecimen.citiesVisitedInOrder = new List<CityElement>();
+            newSpecimen.dataLoaded = dataLoaded;
+            for (int i = 0; i < citiesVisitedInOrder.Count; i++)
+            {
+                newSpecimen.citiesVisitedInOrder.Add(citiesVisitedInOrder[i].Clone());
+            }
+            return newSpecimen;
+
+        }
+
         public string CitiesToString()
         {
             StringBuilder s = new StringBuilder();
-            s.Append(firstCity.index);
+            s.Append(firstCity.index+",");
             foreach (var item in citiesVisitedInOrder)
             {
-                s.Append(item.index);
+                s.Append(item.index+ ",");
             }
             return s.ToString();
         }

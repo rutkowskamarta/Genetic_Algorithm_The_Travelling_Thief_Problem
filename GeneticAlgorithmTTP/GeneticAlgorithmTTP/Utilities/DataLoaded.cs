@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GeneticAlgorithmTTP
 {
-    class DataLoaded
+    public class DataLoaded
     {
         public string problemName { get; set; }
         public int totalNumberOfCities { get; set; }
