@@ -18,6 +18,14 @@ namespace GeneticAlgorithmTTP
             this.yCoordinate = yCoordinate;
             itemsInTheCity = new List<ItemElement>();
         }
+
+        public CityElement(int index, double xCoordinate, double yCoordinate, List<ItemElement> itemsInTheCity)
+        {
+            this.index = index;
+            this.xCoordinate = xCoordinate;
+            this.yCoordinate = yCoordinate;
+            this.itemsInTheCity = itemsInTheCity;
+        }
        
         public double CalculateDistance(CityElement other)
         {
@@ -40,7 +48,7 @@ namespace GeneticAlgorithmTTP
             {
                 return new CityElement(index, xCoordinate, yCoordinate);
             }
-            return new CityElement(index, xCoordinate, yCoordinate);
+            return new CityElement(index, xCoordinate, yCoordinate, itemsInTheCity);
         }
     }
 }

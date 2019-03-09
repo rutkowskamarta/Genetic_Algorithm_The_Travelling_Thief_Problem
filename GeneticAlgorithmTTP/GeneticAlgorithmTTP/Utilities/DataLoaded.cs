@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using static System.Console;
 
 namespace GeneticAlgorithmTTP
 {
@@ -19,20 +19,15 @@ namespace GeneticAlgorithmTTP
 
         public double[,] distancesMatrix;
 
-        private DataLoaded()
-        {
-            //FillTheDistancesMatrix();
-        }
+        private DataLoaded(){}
 
         public static DataLoaded GetInstance()
         {
             if (instance == null)
-            {
                 instance = new DataLoaded();
-            }
+
             return instance;
         }
-
 
         public override string ToString()
         {
@@ -60,9 +55,9 @@ namespace GeneticAlgorithmTTP
                 for (int j = 0; j < totalNumberOfCities; j++)
                 {
                     string format = "{0, -5}";
-                    Console.Write(String.Format(format, (int)distancesMatrix[i, j]));
+                    Write(String.Format(format, (int)distancesMatrix[i, j]));
                 }
-                Console.WriteLine();
+                WriteLine();
             }
         }
     }

@@ -9,11 +9,9 @@ namespace GeneticAlgorithmTTP
 {
     class FileLoader
     {
-        private string fileName;
 
-        public FileLoader(string fileName)
+        public FileLoader()
         {
-            this.fileName = fileName;
             LoadFile();
         }
 
@@ -22,7 +20,7 @@ namespace GeneticAlgorithmTTP
             DataLoaded dataLoaded = DataLoaded.GetInstance();
             try
             {
-                string[] allLines = File.ReadAllLines(fileName);
+                string[] allLines = File.ReadAllLines(Utilities.FILE_NAME);
                 dataLoaded.problemName = allLines[0].Split(' ')[2].Trim();
                 dataLoaded.totalNumberOfCities = int.Parse(ExtractData(allLines[2])[1]);
 
@@ -46,8 +44,6 @@ namespace GeneticAlgorithmTTP
                     line = ExtractData(allLines[counter]);
                 }
             
-                
-
                 counter++;
                 line = ExtractData(allLines[counter]);
 
@@ -66,11 +62,6 @@ namespace GeneticAlgorithmTTP
             catch(Exception e)
             {
                 WriteLine("Problem z parsowaniem "+e);
-            }
-
-            foreach (var item in DataLoaded.GetInstance().cities)
-            {
-                WriteLine(item.ToString());
             }
         }
 

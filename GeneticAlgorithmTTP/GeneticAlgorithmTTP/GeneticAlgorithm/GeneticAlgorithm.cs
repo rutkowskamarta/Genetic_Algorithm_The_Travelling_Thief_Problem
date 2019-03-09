@@ -9,16 +9,16 @@ namespace GeneticAlgorithmTTP
 {
     class GeneticAlgorithm
     {
-        public Thief thief;
+        private DataLoaded dataLoaded = DataLoaded.GetInstance();
 
         private int currentGeneration = 0;
 
-        private List<TSPSpecimen> population;
+        private List<TSPSpecimen> oldPopulation;
         private List<TSPSpecimen> newPopulation;
 
         private TSPSpecimen bestSolution;
 
-        Random random;
+        private Random random;
 
         private delegate TSPSpecimen mutationDelegate(TSPSpecimen specimen);
         private mutationDelegate mutationFunction;
@@ -26,7 +26,7 @@ namespace GeneticAlgorithmTTP
         private delegate List<TSPSpecimen> selectionDelegate();
         private selectionDelegate selectionFunction;
 
-        private SELECTION_METHOD selectionMethod = SELECTION_METHOD.RULETKA;
+        private SELECTION_METHOD selectionMethod = SELECTION_METHOD.RANKING;
         private MUTATION_METHOD mutationMethod = MUTATION_METHOD.SWAP;
 
         public MUTATION_METHOD MutationMethod
@@ -49,7 +49,6 @@ namespace GeneticAlgorithmTTP
                 }
             }
         }
-
         public SELECTION_METHOD SelectionMethod
         {
             get
@@ -64,6 +63,9 @@ namespace GeneticAlgorithmTTP
                     case SELECTION_METHOD.RULETKA:
                         selectionFunction = RouletteSelectionMethod;
                         break;
+                    case SELECTION_METHOD.RANKING:
+                        selectionFunction = RankSelectionMethod;
+                        break;
                 }
             }
         }
@@ -71,7 +73,6 @@ namespace GeneticAlgorithmTTP
 
         public GeneticAlgorithm()
         {
-            thief = new Thief();
             random = new Random();
 
             MutationMethod = mutationMethod;
@@ -82,38 +83,36 @@ namespace GeneticAlgorithmTTP
 
         private void InitializePopulation()
         {
-            population = new List<TSPSpecimen>(POPULATION_SIZE);
+            oldPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
             for (int i = 0; i < POPULATION_SIZE; i++)
-            {
-                population.Add(new TSPSpecimen(DataLoaded.GetInstance()));
-            }
-            foreach (var item in population)
-            {
-                WriteLine(item.CitiesToString());
-            }
+                oldPopulation.Add(new TSPSpecimen());
         }
 
         public TSPSpecimen GeneticCycle()
         {
-            bestSolution = FindBest(population).Clone();
-            Utilities.SaveSolutionToFile(bestSolution, "najzpierwszpokolenia");
+            bestSolution = FindBest(oldPopulation).Clone();
+            SaveSolutionToFile(bestSolution, FILE_ANNOTATION_FIRST);
 
-            WriteLine("BEST: " + bestSolution.TotalTimeOfTravel(thief.currentVelocity) + " " + bestSolution.CitiesToString());
+            Evaluate(oldPopulation);
+
+            WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
 
             while (currentGeneration < NUMBER_OF_GENERATIONS)
             {
                 currentGeneration++;
 
                 newPopulation = Selection();
-                newPopulation.ForEach(p => Cross(p));
-                newPopulation.ForEach(p => Mutate(p));
+                Crossover(newPopulation);
+                Mutation(newPopulation);
+                Evaluate(newPopulation);
 
                 TSPSpecimen bestSolutionInNewPopolation = FindBest(newPopulation);
 
-                if (bestSolutionInNewPopolation.TotalTimeOfTravel(thief.currentVelocity) < bestSolution.TotalTimeOfTravel(thief.currentVelocity))
+                if (bestSolutionInNewPopolation.objectiveFunction > bestSolution.objectiveFunction)
                 {
                     bestSolution = bestSolutionInNewPopolation.Clone();
                 }
+                //WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
 
             }
 
@@ -122,13 +121,87 @@ namespace GeneticAlgorithmTTP
 
         private TSPSpecimen FindBest(List<TSPSpecimen> examinedPopulation)
         {
-            return examinedPopulation.OrderBy(i1 => i1.TotalTimeOfTravel(thief.currentVelocity)).First();
+            return examinedPopulation.OrderByDescending(i1 => i1.objectiveFunction).First();
         }
 
         private List<TSPSpecimen> Selection()
         {
             return selectionFunction();
         }
+
+        private void Mutation(List<TSPSpecimen> population)
+        {
+            population.ForEach(p => Mutate(p));
+        }
+
+        private void Crossover(List<TSPSpecimen> population)
+        {
+            for (int i = 0; i < POPULATION_SIZE; i += 2)
+            {
+                if (i + 1 < POPULATION_SIZE)
+                {
+                    TSPSpecimen[] children = Cross(population[i], population[i + 1]);
+                    population[i] = children[0];
+                    population[i + 1] = children[1];
+                }
+            }
+        }
+
+        private void Evaluate(List<TSPSpecimen> population)
+        {
+            population.ForEach(p => p.SetObjectiveFunction());
+        }
+
+        #region SELECTION_METHODS
+
+        private List<TSPSpecimen> RankSelectionMethod()
+        {
+            List<TSPSpecimen> populationRank = oldPopulation.OrderBy(p => p.objectiveFunction).ToList<TSPSpecimen>();
+            List<TSPSpecimen> nextPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                nextPopulation.Add(RankSelectionMethodForOneSpecimen(populationRank));
+            }
+            return nextPopulation;
+        }
+
+        private TSPSpecimen RankSelectionMethodForOneSpecimen(List<TSPSpecimen> populationRank)
+        {
+            int randomNumber = random.Next(0, POPULATION_SIZE);
+            return populationRank[randomNumber];
+
+        }
+
+        private List<TSPSpecimen> RouletteSelectionMethod()
+        {
+            double totalFitnessSum = oldPopulation.Sum(specimen => specimen.objectiveFunction);
+            List<TSPSpecimen> nextPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                nextPopulation.Add(RouletteSelectionMethodForOneSpecimen(totalFitnessSum));
+            }
+            return nextPopulation;
+        }
+
+        private TSPSpecimen RouletteSelectionMethodForOneSpecimen(double totalFitnessSum)
+        {
+            double randomNumber = random.NextDouble() * totalFitnessSum;
+            double partialSum = 0;
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                partialSum += oldPopulation[i].objectiveFunction;
+                if (partialSum >= randomNumber)
+                {
+                    return oldPopulation[i];
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region MUTATION_FUNCTIONS
 
         private TSPSpecimen Mutate(TSPSpecimen specimen)
         {
@@ -143,67 +216,13 @@ namespace GeneticAlgorithmTTP
             }
         }
 
-        //jedno dziecko powstaje w moim alg
-        private TSPSpecimen Cross(TSPSpecimen self)
-        {
-            double chance = random.NextDouble();
-            if (chance <= PROBABILITY_OF_CROSSOVER)
-            {
-                int index = random.Next(POPULATION_SIZE);
-                TSPSpecimen secondParent = newPopulation[index];
-                return OXCross(self, secondParent);
-            }
-            else
-            {
-                return self;
-            }
-        }
-
-        //wyliczenie dla wszystkich osobników miary
-        private void Evaluate()
-        {
-
-        }
-
-        #region SELECTION_METHODS
-        private List<TSPSpecimen> RouletteSelectionMethod()
-        {
-            double totalFitnessSum = population.Sum(specimen => specimen.TotalTimeOfTravel(thief.currentVelocity));
-            List<TSPSpecimen> newPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
-            for (int i = 0; i < POPULATION_SIZE; i++)
-            {
-                newPopulation.Add(RouletteSelectionMethodForOneSpecimen(totalFitnessSum));
-            }
-            return newPopulation;
-        }
-
-        private TSPSpecimen RouletteSelectionMethodForOneSpecimen(double totalFitnessSum)
-        {
-            double randomNumber = random.NextDouble() * totalFitnessSum;
-            double partialSum = 0;
-            for (int i = 0; i < population.Count; i++)
-            {
-                partialSum += population[i].TotalTimeOfTravel(thief.currentVelocity);
-                if (partialSum >= randomNumber)
-                {
-                    return population[i];
-                }
-            }
-
-            return null;
-        }
-
-        #endregion
-
-        #region MUTATION_FUNCTIONS
-
         private TSPSpecimen SwapMutation(TSPSpecimen specimen)
         {
-            int index1 = random.Next(0, specimen.citiesVisitedInOrder.Count);
-            int index2 = random.Next(0, specimen.citiesVisitedInOrder.Count);
+            int index1 = random.Next(0, dataLoaded.totalNumberOfCities);
+            int index2 = random.Next(0, dataLoaded.totalNumberOfCities);
             while (index2 == index1)
             {
-                index2 = random.Next(0, specimen.citiesVisitedInOrder.Count);
+                index2 = random.Next(0, dataLoaded.totalNumberOfCities);
             }
             CityElement city1 = specimen.citiesVisitedInOrder[index1];
             CityElement city2 = specimen.citiesVisitedInOrder[index2];
@@ -215,11 +234,11 @@ namespace GeneticAlgorithmTTP
 
         private TSPSpecimen InverseMutation(TSPSpecimen specimen)
         {
-            int index1 = random.Next(0, specimen.citiesVisitedInOrder.Count);
-            int index2 = random.Next(0, specimen.citiesVisitedInOrder.Count);
+            int index1 = random.Next(0, dataLoaded.totalNumberOfCities);
+            int index2 = random.Next(0, dataLoaded.totalNumberOfCities);
             while (index2 == index1)
             {
-                index2 = random.Next(0, specimen.citiesVisitedInOrder.Count);
+                index2 = random.Next(0, dataLoaded.totalNumberOfCities);
             }
 
             if (index2 < index1)
@@ -247,14 +266,23 @@ namespace GeneticAlgorithmTTP
         #endregion
 
         #region CROSS_FUNCTIONS
-       
-        private TSPSpecimen OXCross(TSPSpecimen parent1, TSPSpecimen parent2)
+
+        private TSPSpecimen[] Cross(TSPSpecimen parent1, TSPSpecimen parent2)
         {
-            int crossPoint1 = random.Next(0, parent1.citiesVisitedInOrder.Count);
-            int crossPoint2 = random.Next(0, parent1.citiesVisitedInOrder.Count);
+            double chance = random.NextDouble();
+            if (chance <= PROBABILITY_OF_CROSSOVER)
+                return OXCross(parent1, parent2);
+            else
+                return new TSPSpecimen[] { parent1, parent2 };
+        }
+
+        private TSPSpecimen[] OXCross(TSPSpecimen parent1, TSPSpecimen parent2)
+        {
+            int crossPoint1 = random.Next(0, dataLoaded.totalNumberOfCities);
+            int crossPoint2 = random.Next(0, dataLoaded.totalNumberOfCities);
             while (crossPoint2 == crossPoint1)
             {
-                crossPoint2 = random.Next(0, parent1.citiesVisitedInOrder.Count);
+                crossPoint2 = random.Next(0, dataLoaded.totalNumberOfCities);
             }
 
             if (crossPoint2 < crossPoint1)
@@ -263,27 +291,50 @@ namespace GeneticAlgorithmTTP
                 crossPoint2 = crossPoint1;
                 crossPoint1 = temp;
             }
+            TSPSpecimen child1 = OXCrossBasedOnFirstParent(parent1, parent2, crossPoint1, crossPoint2);
+            TSPSpecimen child2 = OXCrossBasedOnFirstParent(parent2, parent1, crossPoint1, crossPoint2);
 
+            return new TSPSpecimen[] { child1, child2 };
+        }
+
+        private TSPSpecimen OXCrossBasedOnFirstParent(TSPSpecimen parent1, TSPSpecimen parent2, int crossPoint1, int crossPoint2)
+        {
             TSPSpecimen child = new TSPSpecimen();
 
-            List<CityElement> crossSection = new List<CityElement>();
-            
+            List<int> crossSection = new List<int>();
+
             for (int i = crossPoint1; i < crossPoint2; i++)
             {
-                crossSection.Add(parent1.citiesVisitedInOrder[i]);
+                crossSection.Add(parent1.citiesVisitedInOrder[i].index);
             }
 
-            List<CityElement> restOfGenes = parent2.citiesVisitedInOrder.Where(p => !crossSection.Any(p2 => p2.index == p.index)).ToList<CityElement>();
+            List<int> restOfGenes = new List<int>();
 
-            List<CityElement> childCities = new List<CityElement>();
+            for (int i = crossPoint2; i < dataLoaded.totalNumberOfCities; i++)
+            {
+                if (!crossSection.Contains(parent2.citiesVisitedInOrder[i].index))
+                    restOfGenes.Add(parent2.citiesVisitedInOrder[i].index);
+            }
 
-            //część pierwsza - wstaw elementy z końca restgenes na początek child
-            int part1Amount = parent1.citiesVisitedInOrder.Count - crossPoint2;
-            childCities.AddRange(restOfGenes.Skip(part1Amount));
-            restOfGenes.RemoveRange(part1Amount,restOfGenes.Count-part1Amount);
+            for (int i = 0; i < crossPoint2; i++)
+            {
+                if (!crossSection.Contains(parent2.citiesVisitedInOrder[i].index))
+                    restOfGenes.Add(parent2.citiesVisitedInOrder[i].index);
+            }
+
+            List<int> childCities = new List<int>();
+
+            int secondPartOfGenes = restOfGenes.Count - crossPoint1;
+
+            childCities.AddRange(restOfGenes.Skip(secondPartOfGenes));
             childCities.AddRange(crossSection);
-            childCities.AddRange(restOfGenes);
-            child.citiesVisitedInOrder = childCities;
+            childCities.AddRange(restOfGenes.Take(secondPartOfGenes));
+            child.citiesVisitedInOrder.Clear();
+
+            for (int i = 0; i < dataLoaded.totalNumberOfCities; i++)
+            {
+                child.citiesVisitedInOrder.Add(dataLoaded.cities[childCities[i] - 1].Clone());
+            }
             return child;
         }
         #endregion
