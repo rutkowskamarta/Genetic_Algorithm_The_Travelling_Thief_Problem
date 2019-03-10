@@ -26,3 +26,4 @@ C:\Users\marar\Desktop\GitHub\AI_TTP\GeneticAlgorithmTTP\GeneticAlgorithmTTP\bin
 C:\Users\marar\Desktop\GitHub\AI_TTP\GeneticAlgorithmTTP\GeneticAlgorithmTTP\bin\Debug\netcoreapp2.1\Data\medium_4.ttp
 C:\Users\marar\Desktop\GitHub\AI_TTP\GeneticAlgorithmTTP\GeneticAlgorithmTTP\bin\Debug\netcoreapp2.1\Data\trivial_0.ttp
 C:\Users\marar\Desktop\GitHub\AI_TTP\GeneticAlgorithmTTP\GeneticAlgorithmTTP\bin\Debug\netcoreapp2.1\Data\trivial_1.ttp
+C:\Users\marar\Desktop\GitHub\AI_TTP\GeneticAlgorithmTTP\GeneticAlgorithmTTP\bin\Debug\netcoreapp2.1\sound.wav

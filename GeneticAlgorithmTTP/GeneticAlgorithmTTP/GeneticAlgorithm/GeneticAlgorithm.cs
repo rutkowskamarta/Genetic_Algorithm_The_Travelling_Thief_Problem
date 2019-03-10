@@ -12,6 +12,7 @@ namespace GeneticAlgorithmTTP
         private DataLoaded dataLoaded = DataLoaded.GetInstance();
 
         private int currentGeneration = 0;
+        private int stagnationCounter = 0;
 
         private List<TSPSpecimen> oldPopulation;
         private List<TSPSpecimen> newPopulation;
@@ -26,8 +27,8 @@ namespace GeneticAlgorithmTTP
         private delegate List<TSPSpecimen> selectionDelegate();
         private selectionDelegate selectionFunction;
 
-        private SELECTION_METHOD selectionMethod = SELECTION_METHOD.RANKING;
-        private MUTATION_METHOD mutationMethod = MUTATION_METHOD.SWAP;
+        private SELECTION_METHOD selectionMethod = SELECTION_METHOD.TURNIEJ;
+        private MUTATION_METHOD mutationMethod = MUTATION_METHOD.INVERSE;
 
         public MUTATION_METHOD MutationMethod
         {
@@ -66,6 +67,9 @@ namespace GeneticAlgorithmTTP
                     case SELECTION_METHOD.RANKING:
                         selectionFunction = RankSelectionMethod;
                         break;
+                    case SELECTION_METHOD.TURNIEJ:
+                        selectionFunction = TournamentSelectionMethod;
+                        break;
                 }
             }
         }
@@ -97,7 +101,7 @@ namespace GeneticAlgorithmTTP
 
             WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
 
-            while (currentGeneration < NUMBER_OF_GENERATIONS)
+            while (currentGeneration < NUMBER_OF_GENERATIONS && stagnationCounter<STAGNATION_FACTOR*NUMBER_OF_GENERATIONS)
             {
                 currentGeneration++;
 
@@ -107,11 +111,20 @@ namespace GeneticAlgorithmTTP
                 Evaluate(newPopulation);
 
                 TSPSpecimen bestSolutionInNewPopolation = FindBest(newPopulation);
+                //WriteLine("BEST: " + bestSolutionInNewPopolation.objectiveFunction);
 
                 if (bestSolutionInNewPopolation.objectiveFunction > bestSolution.objectiveFunction)
                 {
                     bestSolution = bestSolutionInNewPopolation.Clone();
+
+                    stagnationCounter = 0;
                 }
+                else
+                {
+                    stagnationCounter++;
+                }
+
+                oldPopulation = newPopulation;
                 //WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
 
             }
@@ -149,10 +162,44 @@ namespace GeneticAlgorithmTTP
 
         private void Evaluate(List<TSPSpecimen> population)
         {
-            population.ForEach(p => p.SetObjectiveFunction());
+            for (int i = 0; i < population.Count; i++)
+                population[i].SetObjectiveFunction();
         }
 
         #region SELECTION_METHODS
+
+        private List<TSPSpecimen> TournamentSelectionMethod()
+        {
+            
+            List<TSPSpecimen> nextPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
+            for (int i = 0; i < POPULATION_SIZE; i++)
+            {
+                nextPopulation.Add(TournamentSelectionMethodForOneSpecimen());
+            }
+            return nextPopulation;
+        }
+
+        private TSPSpecimen TournamentSelectionMethodForOneSpecimen()
+        {
+            List<TSPSpecimen> chosen = new List<TSPSpecimen>();
+            List<int> randomIndexes = new List<int>();
+            while (randomIndexes.Count < TOURNAMENT_SIZE)
+            {
+                int randomIndex = random.Next(0, POPULATION_SIZE);
+                while (randomIndexes.Contains(randomIndex))
+                {
+                    randomIndex = random.Next(0, POPULATION_SIZE);
+                }
+                randomIndexes.Add(randomIndex);
+            }
+            for (int i = 0; i < TOURNAMENT_SIZE; i++)
+            {
+                chosen.Add(oldPopulation[randomIndexes[i]]);
+            }
+
+            chosen = chosen.OrderByDescending(p=>p.objectiveFunction).ToList();
+            return chosen.First();
+        }
 
         private List<TSPSpecimen> RankSelectionMethod()
         {
@@ -174,28 +221,34 @@ namespace GeneticAlgorithmTTP
 
         private List<TSPSpecimen> RouletteSelectionMethod()
         {
-            double totalFitnessSum = oldPopulation.Sum(specimen => specimen.objectiveFunction);
+            int minimumObjectiveFunction = oldPopulation.Min(specimen => specimen.objectiveFunction);
+            if (minimumObjectiveFunction >= 0)
+            {
+                minimumObjectiveFunction = 0;
+            }
+
+            int totalFitnessSum = oldPopulation.Sum(specimen => specimen.objectiveFunction-minimumObjectiveFunction);
+
             List<TSPSpecimen> nextPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
             for (int i = 0; i < POPULATION_SIZE; i++)
             {
-                nextPopulation.Add(RouletteSelectionMethodForOneSpecimen(totalFitnessSum));
+                nextPopulation.Add(RouletteSelectionMethodForOneSpecimen(totalFitnessSum, minimumObjectiveFunction));
             }
             return nextPopulation;
         }
 
-        private TSPSpecimen RouletteSelectionMethodForOneSpecimen(double totalFitnessSum)
+        private TSPSpecimen RouletteSelectionMethodForOneSpecimen(double totalFitnessSum, double minimumObjectiveFunction)
         {
             double randomNumber = random.NextDouble() * totalFitnessSum;
             double partialSum = 0;
             for (int i = 0; i < POPULATION_SIZE; i++)
             {
-                partialSum += oldPopulation[i].objectiveFunction;
+                partialSum += (oldPopulation[i].objectiveFunction)-minimumObjectiveFunction;
                 if (partialSum >= randomNumber)
                 {
                     return oldPopulation[i];
                 }
             }
-
             return null;
         }
 
@@ -256,10 +309,12 @@ namespace GeneticAlgorithmTTP
             }
 
             citiesInRange = citiesInRange.OrderBy(a => Guid.NewGuid()).ToList();
+
             for (int i = index1; i < index2; i++)
             {
-                specimen.citiesVisitedInOrder[i] = citiesInRange[i];
+                specimen.citiesVisitedInOrder[i] = citiesInRange[i-index1];
             }
+
             return specimen;
         }
 

@@ -9,13 +9,14 @@ namespace GeneticAlgorithmTTP
     public class Thief
     {
         private DataLoaded dataLoaded = DataLoaded.GetInstance();
-        public double currentVelocity { get; set; } = 1f;
+        public double currentVelocity { get; set; }
         public int currentValueOfItems;
         public int currentWeightOfItems;
         public List<ItemElement> knapsack { get; set; }
 
         public Thief()
         {
+            currentVelocity = dataLoaded.maximumSpeed;
             knapsack = new List<ItemElement>();
             currentValueOfItems = 0;
             currentWeightOfItems = 0;
@@ -33,8 +34,6 @@ namespace GeneticAlgorithmTTP
                     knapsack.Add(element);
                     SetParametersOfKnapsack(element);
                     SetSpeedOfThief();
-                    //Console.WriteLine("Steal! hehe " + element.ToString());
-
                 }
             }
 
@@ -42,7 +41,7 @@ namespace GeneticAlgorithmTTP
 
         private ItemElement ChoosePerfectItem(List<ItemElement> items)
         {
-            items = items.OrderBy(i => i.profit).ToList();
+            items = items.OrderByDescending(i => i.profit).ToList();
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -67,9 +66,25 @@ namespace GeneticAlgorithmTTP
 
         }
 
-      
+        public void Reset()
+        {
+            currentVelocity = dataLoaded.maximumSpeed;
+            currentValueOfItems = 0;
+            currentWeightOfItems = 0;
+            knapsack.Clear();
+        }
 
-
-
+        public Thief Clone()
+        {
+            Thief thief = new Thief();
+            thief.currentVelocity = currentVelocity;
+            thief.currentValueOfItems = currentValueOfItems;
+            thief.currentWeightOfItems = currentWeightOfItems;
+            for (int i = 0; i < knapsack.Count; i++)
+            {
+                thief.knapsack.Add(knapsack[i].Clone());
+            }
+            return thief;
+        }
     }
 }
