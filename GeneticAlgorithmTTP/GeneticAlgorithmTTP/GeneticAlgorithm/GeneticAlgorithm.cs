@@ -95,7 +95,7 @@ namespace GeneticAlgorithmTTP
         public TSPSpecimen GeneticCycle()
         {
             bestSolution = FindBest(oldPopulation).Clone();
-            SaveSolutionToFile(bestSolution, FILE_ANNOTATION_FIRST);
+            SavePathSolutionToFile(bestSolution, FILE_ANNOTATION_FIRST);
 
             Evaluate(oldPopulation);
 
@@ -125,7 +125,7 @@ namespace GeneticAlgorithmTTP
                 }
 
                 oldPopulation = newPopulation;
-                //WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
+                WriteLine(currentGeneration+" BEST ogólnie: " + bestSolution.objectiveFunction + " best in current" +bestSolutionInNewPopolation.objectiveFunction);
 
             }
 
@@ -287,7 +287,7 @@ namespace GeneticAlgorithmTTP
 
         private TSPSpecimen InverseMutation(TSPSpecimen specimen)
         {
-            int index1 = random.Next(0, dataLoaded.totalNumberOfCities);
+            int index1 = random.Next(2, dataLoaded.totalNumberOfCities);
             int index2 = random.Next(0, dataLoaded.totalNumberOfCities);
             while (index2 == index1)
             {
@@ -308,7 +308,7 @@ namespace GeneticAlgorithmTTP
                 citiesInRange.Add(specimen.citiesVisitedInOrder[i]);
             }
 
-            citiesInRange = citiesInRange.OrderBy(a => Guid.NewGuid()).ToList();
+            citiesInRange.Reverse();
 
             for (int i = index1; i < index2; i++)
             {

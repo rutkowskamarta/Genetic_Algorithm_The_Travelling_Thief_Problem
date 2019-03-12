@@ -49,10 +49,10 @@ namespace GeneticAlgorithmTTP
             for (int i = 0; i < citiesVisitedInOrder.Count-1; i++)
             {
                 totalTime += CalculateTime(thief.currentVelocity, citiesVisitedInOrder[i].index, citiesVisitedInOrder[i + 1].index);
-                //thief.StealWhenInCity(citiesVisitedInOrder[i]);
+                thief.StealWhenInCity(citiesVisitedInOrder[i]);
             }
             totalTime += CalculateTime(thief.currentVelocity, citiesVisitedInOrder[citiesVisitedInOrder.Count - 1].index, citiesVisitedInOrder[0].index);
-            //thief.StealWhenInCity(citiesVisitedInOrder[0]);
+            thief.StealWhenInCity(citiesVisitedInOrder[0]);
 
             totalTravelTime = (int)Math.Ceiling(totalTime);
         }

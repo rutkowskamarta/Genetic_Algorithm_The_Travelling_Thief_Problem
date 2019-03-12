@@ -19,7 +19,7 @@ namespace GeneticAlgorithmTTP
 
             WriteLine("BEST: " + best.objectiveFunction+ " "+best.CitiesToString());
 
-            Utilities.SaveSolutionToFile(best, Utilities.FILE_ANNOTATION_ROZWIAZANIE);
+            Utilities.SavePathSolutionToFile(best, Utilities.FILE_ANNOTATION_ROZWIAZANIE);
             WaveStream mainOutputStream = new WaveFileReader(Utilities.SOUND_FILE_NAME);
             WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
