@@ -10,6 +10,7 @@ namespace GeneticAlgorithmTTP
     class GeneticAlgorithm
     {
         private DataLoaded dataLoaded = DataLoaded.GetInstance();
+        private CsvStatisticsHolder statisticsHolder = CsvStatisticsHolder.GetInstance();
 
         private int currentGeneration = 0;
         private int stagnationCounter = 0;
@@ -95,9 +96,12 @@ namespace GeneticAlgorithmTTP
         public TSPSpecimen GeneticCycle()
         {
             bestSolution = FindBest(oldPopulation).Clone();
-            SavePathSolutionToFile(bestSolution, FILE_ANNOTATION_FIRST);
+            SavePathSolutionToFile(bestSolution, CSV_SAVE_LOCATION_FIRST, FILE_ANNOTATION_FIRST);
+            SaveKnapsackSolutionToFile(bestSolution, CSV_SAVE_LOCATION_KNAPSACK_FIRST, FILE_ANNOTATION_KNAPSACK_FIRST);
 
-            Evaluate(oldPopulation);
+            statisticsHolder.AddNewGenerationStatistics(currentGeneration, oldPopulation);
+
+            //Evaluate(oldPopulation);
 
             WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
 
@@ -111,7 +115,6 @@ namespace GeneticAlgorithmTTP
                 Evaluate(newPopulation);
 
                 TSPSpecimen bestSolutionInNewPopolation = FindBest(newPopulation);
-                //WriteLine("BEST: " + bestSolutionInNewPopolation.objectiveFunction);
 
                 if (bestSolutionInNewPopolation.objectiveFunction > bestSolution.objectiveFunction)
                 {
@@ -123,6 +126,8 @@ namespace GeneticAlgorithmTTP
                 {
                     stagnationCounter++;
                 }
+
+                statisticsHolder.AddNewGenerationStatistics(currentGeneration, newPopulation);
 
                 oldPopulation = newPopulation;
                 WriteLine(currentGeneration+" BEST ogólnie: " + bestSolution.objectiveFunction + " best in current" +bestSolutionInNewPopolation.objectiveFunction);

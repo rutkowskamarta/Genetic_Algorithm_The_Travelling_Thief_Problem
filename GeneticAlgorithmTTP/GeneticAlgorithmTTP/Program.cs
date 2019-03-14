@@ -19,7 +19,15 @@ namespace GeneticAlgorithmTTP
 
             WriteLine("BEST: " + best.objectiveFunction+ " "+best.CitiesToString());
 
-            Utilities.SavePathSolutionToFile(best, Utilities.FILE_ANNOTATION_ROZWIAZANIE);
+            Utilities.SavePathSolutionToFile(best, Utilities.CSV_SAVE_LOCATION_SOLUTION, Utilities.FILE_ANNOTATION_SOLUTION);
+            Utilities.SaveKnapsackSolutionToFile(best, Utilities.CSV_SAVE_LOCATION_KNAPSACK_SOLUTION, Utilities.FILE_ANNOTATION_KNAPSACK_SOLUTION);
+            Utilities.SaveStatisticsToFile();
+            PlayFinishSound();
+            ReadLine();
+        }
+
+        private static void PlayFinishSound()
+        {
             WaveStream mainOutputStream = new WaveFileReader(Utilities.SOUND_FILE_NAME);
             WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
@@ -28,9 +36,8 @@ namespace GeneticAlgorithmTTP
             player.Init(volumeStream);
 
             player.Play();
-            ReadLine();
-        }
 
+        }
       
     }
 }
