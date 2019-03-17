@@ -37,7 +37,7 @@ namespace GeneticAlgorithmTTP
             StringBuilder stringBuilder = new StringBuilder();
             foreach (var item in itemsInTheCity)
             {
-                stringBuilder.Append(item.index);
+                stringBuilder.Append(item.profit+" "+item.weight+" "+item.assignedNodeNumber);
             }
             return $"{index} {xCoordinate} {yCoordinate} items: {stringBuilder.ToString()}";
         }

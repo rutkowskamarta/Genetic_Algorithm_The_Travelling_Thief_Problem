@@ -34,6 +34,7 @@ namespace GeneticAlgorithmTTP
                     knapsack.Add(element);
                     SetParametersOfKnapsack(element);
                     SetSpeedOfThief();
+                    //Console.WriteLine("cur sp " + currentVelocity + " cur val " + currentVelocity + currentValueOfItems + " cur weight " + currentWeightOfItems);
                 }
             }
 
@@ -41,7 +42,7 @@ namespace GeneticAlgorithmTTP
 
         private ItemElement ChoosePerfectItem(List<ItemElement> items)
         {
-            items = items.OrderByDescending(i => i.profit).ToList();
+            items = items.OrderByDescending(i => i.profit/i.weight).ToList();
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -62,8 +63,8 @@ namespace GeneticAlgorithmTTP
 
         private void SetSpeedOfThief()
         {
+            //Console.WriteLine(dataLoaded.maximumSpeed + " " + dataLoaded.minimumSpeed + " " + dataLoaded.capacityOfKnapsack + " " + currentValueOfItems + " " + currentWeightOfItems);
             currentVelocity = dataLoaded.maximumSpeed - currentWeightOfItems * (dataLoaded.maximumSpeed- dataLoaded.minimumSpeed)/dataLoaded.capacityOfKnapsack;
-
         }
 
         public void Reset()

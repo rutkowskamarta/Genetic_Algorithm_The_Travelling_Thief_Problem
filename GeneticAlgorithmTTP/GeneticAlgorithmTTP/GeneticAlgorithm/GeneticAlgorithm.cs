@@ -101,7 +101,6 @@ namespace GeneticAlgorithmTTP
 
             statisticsHolder.AddNewGenerationStatistics(currentGeneration, oldPopulation);
 
-            //Evaluate(oldPopulation);
 
             WriteLine("BEST: " + bestSolution.objectiveFunction + " " + bestSolution.CitiesToString());
 
@@ -130,7 +129,7 @@ namespace GeneticAlgorithmTTP
                 statisticsHolder.AddNewGenerationStatistics(currentGeneration, newPopulation);
 
                 oldPopulation = newPopulation;
-                WriteLine(currentGeneration+" BEST ogólnie: " + bestSolution.objectiveFunction + " best in current" +bestSolutionInNewPopolation.objectiveFunction);
+                WriteLine(currentGeneration+" BEST ogólnie: " + bestSolution.objectiveFunction + " best in current: " +bestSolutionInNewPopolation.objectiveFunction);
 
             }
 
@@ -162,6 +161,7 @@ namespace GeneticAlgorithmTTP
                     population[i] = children[0];
                     population[i + 1] = children[1];
                 }
+               
             }
         }
 

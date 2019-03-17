@@ -43,17 +43,21 @@ namespace GeneticAlgorithmTTP
                     counter++;
                     line = ExtractData(allLines[counter]);
                 }
-            
-                counter++;
-                line = ExtractData(allLines[counter]);
 
                 while (counter<allLines.Length-1)
                 {
-                    ItemElement item = new ItemElement(int.Parse(line[0]), int.Parse(line[1]), int.Parse(line[2]), int.Parse(line[3]));
-                    dataLoaded.cities[item.assignedNodeNumber-2].itemsInTheCity.Add(item);
                     counter++;
                     line = ExtractData(allLines[counter]);
+
+                    ItemElement item = new ItemElement(int.Parse(line[0]), int.Parse(line[1]), int.Parse(line[2]), int.Parse(line[3]));
+                    dataLoaded.cities[item.assignedNodeNumber-1].itemsInTheCity.Add(item);
+                   
                 }
+
+                //foreach (var item in dataLoaded.cities)
+                //{
+                //    WriteLine(item.ToString());
+                //}
 
             }catch(IOException e)
             {
