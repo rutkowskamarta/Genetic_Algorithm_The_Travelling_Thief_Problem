@@ -13,16 +13,28 @@ namespace GeneticAlgorithmTTP
         {
             FileLoader fileLoader = new FileLoader();
             DataLoaded.GetInstance().FillTheDistancesMatrix();
+
+            for (int i = 0; i < 10; i++)
+            {
+                Play();
+            }
+            PlayFinishSound();
+
+            ReadLine();
+
+        }
+
+        private static void Play()
+        {
             GeneticAlgorithm g = new GeneticAlgorithm();
             TSPSpecimen best = g.GeneticCycle();
 
             //TSPSpecimen best = new TSPSpecimen();
-            WriteLine("BEST: " + best.objectiveFunction+ " "+best.CitiesToString());
+            WriteLine("BEST: " + best.objectiveFunction + " " + best.CitiesToString());
             Utilities.SavePathSolutionToFile(best, Utilities.CSV_SAVE_LOCATION_SOLUTION, Utilities.FILE_ANNOTATION_SOLUTION);
             Utilities.SaveKnapsackSolutionToFile(best, Utilities.CSV_SAVE_LOCATION_KNAPSACK_SOLUTION, Utilities.FILE_ANNOTATION_KNAPSACK_SOLUTION);
             Utilities.SaveStatisticsToFile();
-            PlayFinishSound();
-            ReadLine();
+
         }
 
         private static void PlayFinishSound()

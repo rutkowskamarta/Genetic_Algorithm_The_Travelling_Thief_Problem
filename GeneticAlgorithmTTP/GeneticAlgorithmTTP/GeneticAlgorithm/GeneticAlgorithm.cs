@@ -91,6 +91,9 @@ namespace GeneticAlgorithmTTP
             oldPopulation = new List<TSPSpecimen>(POPULATION_SIZE);
             for (int i = 0; i < POPULATION_SIZE; i++)
                 oldPopulation.Add(new TSPSpecimen());
+
+            //oldPopulation = oldPopulation.OrderByDescending(i => i.objectiveFunction).ToList();
+
         }
 
         public TSPSpecimen GeneticCycle()
@@ -181,6 +184,8 @@ namespace GeneticAlgorithmTTP
             {
                 nextPopulation.Add(TournamentSelectionMethodForOneSpecimen());
             }
+            //nextPopulation = nextPopulation.OrderByDescending(i => i.objectiveFunction).ToList();
+
             return nextPopulation;
         }
 
