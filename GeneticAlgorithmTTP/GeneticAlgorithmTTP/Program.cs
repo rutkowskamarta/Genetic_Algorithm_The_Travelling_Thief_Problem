@@ -1,40 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using static System.Console;
-using NAudio;
+using System.Linq;
 using NAudio.Wave;
 
 namespace GeneticAlgorithmTTP
 {
     class Program
     {
+        static List<CsvTotalResult> results = new List<CsvTotalResult>();
 
         static void Main(string[] args)
         {
             FileLoader fileLoader = new FileLoader();
             DataLoaded.GetInstance().FillTheDistancesMatrix();
 
-            for (int i = 0; i < 10; i++)
-            {
-                Play();
-            }
-            PlayFinishSound();
+            
+            RunGeneticAlgorithm();
 
+            Utilities.SaveTotalsToFile(results);
+            PlayFinishSound();
+            WriteLine("==========KONIEC==========");
             ReadLine();
 
         }
 
-        private static void Play()
+        private static void RunGeneticAlgorithm()
         {
+            CsvStatisticsHolder.GetInstance().Reset();
             GeneticAlgorithm g = new GeneticAlgorithm();
             TSPSpecimen best = g.GeneticCycle();
 
-            //TSPSpecimen best = new TSPSpecimen();
-            WriteLine("BEST: " + best.objectiveFunction + " " + best.CitiesToString());
-            Utilities.SavePathSolutionToFile(best, Utilities.CSV_SAVE_LOCATION_SOLUTION, Utilities.FILE_ANNOTATION_SOLUTION);
-            Utilities.SaveKnapsackSolutionToFile(best, Utilities.CSV_SAVE_LOCATION_KNAPSACK_SOLUTION, Utilities.FILE_ANNOTATION_KNAPSACK_SOLUTION);
-            Utilities.SaveStatisticsToFile();
+            WriteLine("FINISH: " + best.objectiveFunction);
 
+            int b = best.objectiveFunction;
+            double avg = CsvStatisticsHolder.GetInstance().results.Average(p => p.averageOfResults);
+            double minavg = (CsvStatisticsHolder.GetInstance().results.Average(p => p.worstResult));
+            double maxavg = (CsvStatisticsHolder.GetInstance().results.Average(p => p.bestResult));
+
+            results.Add(new CsvTotalResult(b, maxavg, minavg, avg));
+            Utilities.SaveStatisticsToFile();
         }
 
         private static void PlayFinishSound()

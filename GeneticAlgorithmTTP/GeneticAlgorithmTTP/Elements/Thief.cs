@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace GeneticAlgorithmTTP
 {
-    //ZAWSZE BIORĘ NAJCENNIEJSZY PRZEDMIOT
     public class Thief
     {
         private DataLoaded dataLoaded = DataLoaded.GetInstance();
@@ -23,7 +22,6 @@ namespace GeneticAlgorithmTTP
             SetSpeedOfThief();
         }
 
-
         public void StealWhenInCity(CityElement city)
         {
             if(city.itemsInTheCity.Count!= 0)
@@ -34,7 +32,6 @@ namespace GeneticAlgorithmTTP
                     knapsack.Add(element);
                     SetParametersOfKnapsack(element);
                     SetSpeedOfThief();
-                    //Console.WriteLine("cur sp " + currentVelocity + " cur val " + currentVelocity + currentValueOfItems + " cur weight " + currentWeightOfItems);
                 }
             }
 
@@ -47,9 +44,7 @@ namespace GeneticAlgorithmTTP
             for (int i = 0; i < items.Count; i++)
             {
                 if(dataLoaded.capacityOfKnapsack - currentWeightOfItems > items[i].weight)
-                {
                     return items[i];
-                }
             }
             return null;
         }
@@ -63,7 +58,6 @@ namespace GeneticAlgorithmTTP
 
         private void SetSpeedOfThief()
         {
-            //Console.WriteLine(dataLoaded.maximumSpeed + " " + dataLoaded.minimumSpeed + " " + dataLoaded.capacityOfKnapsack + " " + currentValueOfItems + " " + currentWeightOfItems);
             currentVelocity = dataLoaded.maximumSpeed - currentWeightOfItems * (dataLoaded.maximumSpeed- dataLoaded.minimumSpeed)/dataLoaded.capacityOfKnapsack;
         }
 
@@ -82,9 +76,8 @@ namespace GeneticAlgorithmTTP
             thief.currentValueOfItems = currentValueOfItems;
             thief.currentWeightOfItems = currentWeightOfItems;
             for (int i = 0; i < knapsack.Count; i++)
-            {
                 thief.knapsack.Add(knapsack[i].Clone());
-            }
+
             return thief;
         }
     }

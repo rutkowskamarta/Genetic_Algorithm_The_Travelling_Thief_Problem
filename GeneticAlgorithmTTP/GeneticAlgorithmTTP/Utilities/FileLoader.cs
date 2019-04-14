@@ -9,7 +9,6 @@ namespace GeneticAlgorithmTTP
 {
     class FileLoader
     {
-
         public FileLoader()
         {
             LoadFile();
@@ -53,13 +52,8 @@ namespace GeneticAlgorithmTTP
                     dataLoaded.cities[item.assignedNodeNumber-1].itemsInTheCity.Add(item);
                    
                 }
-
-                //foreach (var item in dataLoaded.cities)
-                //{
-                //    WriteLine(item.ToString());
-                //}
-
-            }catch(IOException e)
+            }
+            catch (IOException e)
             {
                 WriteLine("Nie udało się odczytać pliku " + e);
             }

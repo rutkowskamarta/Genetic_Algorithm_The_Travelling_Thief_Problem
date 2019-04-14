@@ -10,7 +10,6 @@ namespace GeneticAlgorithmTTP
         private static CsvStatisticsHolder instance = null;
         public List<CsvResult> results;
 
-
         private CsvStatisticsHolder()
         {
             results = new List<CsvResult>();
@@ -19,9 +18,8 @@ namespace GeneticAlgorithmTTP
         public static CsvStatisticsHolder GetInstance()
         {
             if(instance == null)
-            {
                 instance = new CsvStatisticsHolder();
-            }
+
             return instance;
         }
 
@@ -34,6 +32,9 @@ namespace GeneticAlgorithmTTP
             results.Add(new CsvResult(generationCounter, bestSolution, worstSolution, average));
         }
 
-
+        public void Reset()
+        {
+            results.Clear();
+        }
     }
 }

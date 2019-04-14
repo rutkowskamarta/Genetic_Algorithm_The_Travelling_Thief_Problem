@@ -36,18 +36,16 @@ namespace GeneticAlgorithmTTP
         {
             StringBuilder stringBuilder = new StringBuilder();
             foreach (var item in itemsInTheCity)
-            {
                 stringBuilder.Append(item.profit+" "+item.weight+" "+item.assignedNodeNumber);
-            }
+
             return $"{index} {xCoordinate} {yCoordinate} items: {stringBuilder.ToString()}";
         }
 
         public CityElement Clone()
         {
             if(itemsInTheCity.Count == 0)
-            {
                 return new CityElement(index, xCoordinate, yCoordinate);
-            }
+
             return new CityElement(index, xCoordinate, yCoordinate, itemsInTheCity);
         }
     }
